@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>京东导航栏</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --jd-red: #e1251b;
+      --jd-red-dark: #c81623;
+      --jd-red-light: #f23030;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #333333;
+      --text-secondary: #999999;
+      --text-muted: #666666;
+      --border-color: #e5e5e5;
+    }
+ 
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+ 
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: var(--bg-secondary);
+      min-height: 100vh;
+    }
+ 
+    /* 顶部导航栏 */
+    .top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+    }
+ 
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0 20px;
+      height: 32px;
+    }
+ 
+    .nav-list {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+ 
+    .nav-item {
+      position: relative;
+      padding: 0 12px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+ 
+    .nav-item a {
+      color: var(--text-muted);
+      font-size: 12px;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      white-space: nowrap;
+    }
+ 
+    .nav-item:hover a {
+      color: var(--jd-red);
+    }
+ 
+    .nav-item:hover {
+      background: var(--bg-primary);
+    }
+ 
+    /* 分隔线 */
+    .nav-divider {
+      width: 1px;
+      height: 12px;
+      background: var(--border-color);
+    }
+ 
+    /* 购物车特殊样式 */
+    .nav-cart {
+      position: relative;
+    }
+ 
+    .cart-badge {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      min-width: 16px;
+      height: 16px;
+      background: var(--jd-red);
+      color: white;
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      animation: pulse 2s infinite;
+    }
+ 
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+ 
+    .cart-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
+ 
+    /* 下拉箭头 */
+    .nav-dropdown::after {
+      content: '';
+      display: inline-block;
+      width: 0;
+      height: 0;
+      border-left: 3px solid transparent;
+      border-right: 3px solid transparent;
+      border-top: 4px solid var(--text-muted);
+      margin-left: 4px;
+      transition: transform 0.2s ease;
+    }
+ 
+    .nav-item:hover.nav-dropdown::after {
+      transform: rotate(180deg);
+      border-top-color: var(--jd-red);
+    }
+ 
+    /* 下拉面板 */
+    .dropdown-panel {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-top: none;
+      min-width: 200px;
+      padding: 12px 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+    }
+ 
+    .nav-item:hover .dropdown-panel {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+ 
+    .dropdown-item {
+      padding: 8px 16px;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+ 
+    .dropdown-item:hover {
+      background: var(--bg-secondary);
+      color: var(--jd-red);
+    }
+ 
+    /* 主头部区域 */
+    .main-header {
+      background: var(--bg-primary);
+      padding: 20px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+ 
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+ 
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+ 
+    .logo-icon {
+      width: 120px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+    }
+ 
+    .logo-dog {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--jd-red) 0%, var(--jd-red-dark) 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: float 3s ease-in-out infinite;
+    }
+ 
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+ 
+    .logo-dog svg {
+      width: 30px;
+      height: 30px;
+      fill: white;
+    }
+ 
+    .logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--jd-red);
+      letter-spacing: -1px;
+    }
+ 
+    /* 搜索框 */
+    .search-box {
+      flex: 1;
+      max-width: 550px;
+      margin: 0 60px;
+      position: relative;
+    }
+ 
+    .search-input-wrapper {
+      display: flex;
+      border: 2px solid var(--jd-red);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease;
+    }
+ 
+    .search-input-wrapper:focus-within {
+      box-shadow: 0 0 0 2px rgba(225, 37, 27, 0.2);
+    }
+ 
+    .search-input {
+      flex: 1;
+      height: 40px;
+      padding: 0 16px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+ 
+    .search-input::placeholder {
+      color: var(--text-secondary);
+    }
+ 
+    .search-btn {
+      width: 80px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--jd-red) 0%, var(--jd-red-dark) 100%);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+ 
+    .search-btn:hover {
+      background: linear-gradient(135deg, var(--jd-red-light) 0%, var(--jd-red) 100%);
+    }
+ 
+    .search-btn:active {
+      transform: scale(0.98);
+    }
+ 
+    .search-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: white;
+      stroke-width: 2.5;
+    }
+ 
+    /* 热门搜索 */
+    .hot-search {
+      display: flex;
+      gap: 16px;
+      margin-top: 8px;
+    }
+ 
+    .hot-tag {
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+ 
+    .hot-tag:hover {
+      color: var(--jd-red);
+    }
+ 
+    .hot-tag.hot {
+      color: var(--jd-red);
+    }
+ 
+    /* 购物车按钮 */
+    .header-cart {
+      position: relative;
+    }
+ 
+    .cart-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+    }
+ 
+    .cart-btn:hover {
+      border-color: var(--jd-red);
+      color: var(--jd-red);
+    }
+ 
+    .cart-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+ 
+    .cart-btn span {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+ 
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      min-width: 20px;
+      height: 20px;
+      background: var(--jd-red);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 6px;
+    }
+ 
+    /* 动画效果 */
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+ 
+    .nav-item {
+      animation: slideDown 0.3s ease forwards;
+    }
+ 
+    .nav-item:nth-child(1) { animation-delay: 0.05s; }
+    .nav-item:nth-child(2) { animation-delay: 0.1s; }
+    .nav-item:nth-child(3) { animation-delay: 0.15s; }
+    .nav-item:nth-child(4) { animation-delay: 0.2s; }
+    .nav-item:nth-child(5) { animation-delay: 0.25s; }
+ 
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .nav-container {
+        justify-content: center;
+      }
+      
+      .nav-item {
+        padding: 0 8px;
+      }
+      
+      .nav-item a {
+        font-size: 11px;
+      }
+      
+      .header-container {
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      
+      .search-box {
+        margin: 0;
+        order: 3;
+        max-width: 100%;
+      }
+    }
+ 
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航栏 -->
+  <nav class="top-nav">
+    <div class="nav-container">
+      <ul class="nav-list" role="menubar">
+        <li class="nav-item nav-cart" role="menuitem">
+          <a href="#" aria-label="购物车，7件商品">
+            <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            购物车
+          </a>
+          <span class="cart-badge">7</span>
+        </li>
+        
+        <li class="nav-divider" aria-hidden="true"></li>
+        
+        <li class="nav-item nav-dropdown" role="menuitem">
+          <a href="#">我的订单</a>
+          <div class="dropdown-panel">
+            <div class="dropdown-item">待付款订单</div>
+            <div class="dropdown-item">待收货订单</div>
+            <div class="dropdown-item">已完成订单</div>
+            <div class="dropdown-item">退换/售后</div>
+          </div>
+        </li>
+        
+        <li class="nav-divider" aria-hidden="true"></li>
+        
+        <li class="nav-item nav-dropdown" role="menuitem">
+          <a href="#">我的京东</a>
+          <div class="dropdown-panel">
+            <div class="dropdown-item">个人中心</div>
+            <div class="dropdown-item">账户设置</div>
+            <div class="dropdown-item">地址管理</div>
+            <div class="dropdown-item">我的收藏</div>
+            <div class="dropdown-item">我的浏览</div>
+          </div>
+        </li>
+        
+        <li class="nav-divider" aria-hidden="true"></li>
+        
+        <li class="nav-item" role="menuitem">
+          <a href="#">企业采购</a>
+        </li>
+        
+        <li class="nav-divider" aria-hidden="true"></li>
+        
+        <li class="nav-item nav-dropdown" role="menuitem">
+          <a href="#">网站导航</a>
+          <div class="dropdown-panel">
+            <div class="dropdown-item">全部分类</div>
+            <div class="dropdown-item">品牌专区</div>
+            <div class="dropdown-item">京东超市</div>
+            <div class="dropdown-item">京东国际</div>
+          </div>
+        </li>
+        
+        <li class="nav-divider" aria-hidden="true"></li>
+        
+        <li class="nav-item" role="menuitem">
+          <a href="#">手机京东</a>
+        </li>
+        
+        <li class="nav-divider" aria-hidden="true"></li>
+        
+        <li class="nav-item" role="menuitem">
+          <a href="#">网站无障碍</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+ 
+  <!-- 主头部区域 -->
+  <header class="main-header">
+    <div class="header-container">
+      <!-- Logo -->
+      <div class="logo">
+        <div class="logo-icon">
+          <div class="logo-dog">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <span class="logo-text">京东</span>
+        </div>
+      </div>
+ 
+      <!-- 搜索框 -->
+      <div class="search-box">
+        <div class="search-input-wrapper">
+          <input type="text" class="search-input" placeholder="搜索商品/品牌/店铺" aria-label="搜索">
+          <button class="search-btn" aria-label="搜索按钮">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="M21 21l-4.35-4.35"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="hot-search">
+          <span class="hot-tag hot">手机</span>
+          <span class="hot-tag">笔记本</span>
+          <span class="hot-tag">空调</span>
+          <span class="hot-tag">冰箱</span>
+          <span class="hot-tag">洗衣机</span>
+        </div>
+      </div>
+ 
+      <!-- 购物车 -->
+      <div class="header-cart">
+        <button class="cart-btn" aria-label="购物车">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span>我的购物车</span>
+        </button>
+        <span class="cart-count">7</span>
+      </div>
+    </div>
+  </header>
+ 
+  <script>
+    // 热门搜索标签点击效果
+    document.querySelectorAll('.hot-tag').forEach(tag => {
+      tag.addEventListener('click', function() {
+        const searchInput = document.querySelector('.search-input');
+        searchInput.value = this.textContent;
+        searchInput.focus();
+        
+        // 点击动画
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 100);
+      });
+    });
+ 
+    // 搜索框交互
+    const searchInput = document.querySelector('.search-input');
+    const searchBtn = document.querySelector('.search-btn');
+ 
+    searchBtn.addEventListener('click', function() {
+      const query = searchInput.value.trim();
+      if (query) {
+        // 模拟搜索反馈
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          this.style.transform = '';
+        }, 150);
+      }
+    });
+ 
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        searchBtn.click();
+      }
+    });
+ 
+    // 购物车按钮交互
+    const cartBtn = document.querySelector('.header-cart .cart-btn');
+    cartBtn.addEventListener('click', function() {
+      this.style.transform = 'scale(0.98)';
+      setTimeout(() => {
+        this.style.transform = '';
+      }, 150);
+    });
+ 
+    // 下拉菜单键盘导航
+    document.querySelectorAll('.nav-dropdown').forEach(item => {
+      item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          const dropdown = this.querySelector('.dropdown-panel');
+          const firstItem = dropdown.querySelector('.dropdown-item');
+          if (firstItem) firstItem.focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
